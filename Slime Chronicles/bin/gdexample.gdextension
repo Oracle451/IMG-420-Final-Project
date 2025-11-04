@@ -1,0 +1,15 @@
+[configuration]
+entry_symbol = "distortion_library_init"
+compatibility_minimum = "4.1"
+reloadable = true
+
+[libraries]
+
+windows.debug.x86_64 = "res://bin/distortionLib.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "res://bin/distortionLib.windows.template_release.x86_64.dll"
+
+# Optional (remove or leave if you only build for Windows)
+macos.debug = "res://bin/distortionLib.macos.template_debug.framework"
+macos.release = "res://bin/distortionLib.macos.template_release.framework"
+linux.debug.x86_64 = "res://bin/distortionLib.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://bin/distortionLib.linux.template_release.x86_64.so"
