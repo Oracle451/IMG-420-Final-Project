@@ -11,7 +11,8 @@ config_version=5
 [application]
 
 config/name="Slime Chronicles - IMG-420 Final Project"
-config/features=PackedStringArray("4.4", "Forward Plus")
+run/main_scene="uid://c3lxe3dld64uu"
+config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [dotnet]

@@ -157,3 +157,9 @@ float DistortionSprite2D::sample_noise(const Vector2 &pos, float t) const {
 	float out = (float)(h & 0xFFFF) / (float)0xFFFF; // [0,1]
 	return (out - 0.5f) * 2.0f; // [-1,1]
 }
+
+void DistortionSprite2D::_draw() {
+    for (int i = 0; i < vertices.size(); i++) {
+        draw_circle(vertices[i], 3.0, Color(1, 0, 0));
+    }
+}
