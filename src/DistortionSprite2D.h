@@ -9,6 +9,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
+
 #include <vector>
 
 using namespace godot;
@@ -45,6 +46,8 @@ public:
 	// Godot callbacks
 	void _ready() override;
 	void _process(double delta) override;
+	void _draw() override;
+
 
 	// API
 	void apply_impulse(const Vector2 &point, const Vector2 &force);
