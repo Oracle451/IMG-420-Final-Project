@@ -1,26 +1,26 @@
-// Player.cs – DELIVERABLE 1 FINAL (November 18th 2025)
-// All impulses strictly clamped 0.05 → 0.5
-// Looks soft, jelly-like, never collapses, matches your document perfectly
+// Handles Player movement and applying impulses
 using Godot;
 
 public partial class Player : CharacterBody2D
 {
+	// Set the players speed, jump velocity, and gravity
 	[Export] public float Speed = 300f;
 	[Export] public float JumpVelocity = -400f;
 	[Export] public float Gravity = 980f;
 
-	// These are now just "feel knobs" – actual forces are always clamped 0.05–0.5
-	[ExportGroup("Slime Deformation (feel knobs)")]
-	[Export] public float MoveStretch   = 0.4f;   // 0.1–1.0 feels good
-	[Export] public float JumpStretch    = 0.6f;
-	[Export] public float LandSquash     = 0.8f;
-	[Export] public float IdleBreathing  = 0.3f;
+	// Variables to set how the much the player stretches and squishes upon certain actions
+	[ExportGroup("Slime Deformation")]
+	[Export] public float MoveStretch = 0.4f;
+	[Export] public float JumpStretch = 0.6f;
+	[Export] public float LandSquash = 0.8f;
+	[Export] public float IdleBreathing = 0.3f;
 
 	private Node _distortion;
 	private bool _wasOnFloor;
 
 	public override void _Ready()
 	{
+		// Get the sprite and set the mesh to its original state
 		_distortion = GetNode("DistortionSprite2D");
 		_distortion?.Call("reset_mesh");
 	}
@@ -32,7 +32,9 @@ public partial class Player : CharacterBody2D
 
 		// Gravity
 		if (!IsOnFloor())
+		{
 			vel.Y += Gravity * d;
+		}
 
 		// Jump
 		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
@@ -77,7 +79,7 @@ public partial class Player : CharacterBody2D
 		MoveAndSlide();
 	}
 
-	// THE KEY: every single impulse is forced into 0.05–0.5 range
+	// Function to clamp every impulse into a defined range to keep exaggerated distortion from occuring
 	private void ApplyClampedImpulse(Vector2 point, Vector2 desiredForce)
 	{
 		// Scale the vector so its length is clamped between 0.05 and 0.5
