@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dnkuu6e83c5oq" path="res://scenes/player.tscn" id="1_dojpo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_d0gs8"]
-size = Vector2(1186.5, 129)
+size = Vector2(1301.5, 129)
 
 [node name="Node2D" type="StaticBody2D"]
 position = Vector2(-11, 3)
@@ -11,11 +11,11 @@ position = Vector2(-11, 3)
 [node name="ColorRect" type="ColorRect" parent="."]
 offset_left = -6.0
 offset_top = 519.0
-offset_right = 1180.0
-offset_bottom = 645.0
+offset_right = 1294.0
+offset_bottom = 721.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(587.75, 581.5)
+position = Vector2(645.25, 581.5)
 shape = SubResource("RectangleShape2D_d0gs8")
 
 [node name="Player" parent="." instance=ExtResource("1_dojpo")]
