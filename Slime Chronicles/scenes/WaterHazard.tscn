@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://dfq41moiefjbv"]
+
+[ext_resource type="Script" uid="uid://x0sgmyk8fcvi" path="res://scenes/WaterHazard.cs" id="1_67n05"]
+[ext_resource type="Texture2D" uid="uid://do86yoot3rhpo" path="res://assets/art/Water.png" id="1_lstmf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lstmf"]
+size = Vector2(698, 128)
+
+[node name="WaterHazzard" type="Node2D"]
+script = ExtResource("1_67n05")
+
+[node name="DistortionSprite2D" type="DistortionSprite2D" parent="."]
+damping = 4.0
+noise_amplitude = 10.0
+noise_speed = 5.0
+texture = ExtResource("1_lstmf")
+scale = Vector2(2, 1)
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(1, -1)
+shape = SubResource("RectangleShape2D_lstmf")

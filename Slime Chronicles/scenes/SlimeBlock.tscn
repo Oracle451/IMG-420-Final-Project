@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=3 uid="uid://yx5stlu5ot8f"]
+
+[ext_resource type="Script" uid="uid://b0sp08ffkiqjm" path="res://SlimeBlock.cs" id="1_6efag"]
+[ext_resource type="Texture2D" uid="uid://c05j81tljkw1a" path="res://assets/art/SlimeBlock.png" id="2_7lbu2"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_7lbu2"]
+friction = 0.1
+bounce = 0.5
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1l718"]
+size = Vector2(102, 96)
+
+[node name="SlimeBlock" type="RigidBody2D"]
+mass = 0.5
+physics_material_override = SubResource("PhysicsMaterial_7lbu2")
+can_sleep = false
+lock_rotation = true
+script = ExtResource("1_6efag")
+
+[node name="DistortionSprite2D" type="DistortionSprite2D" parent="."]
+damping = 1.0
+noise_amplitude = 20.0
+noise_speed = 5.0
+texture = ExtResource("2_7lbu2")
+scale = Vector2(0.2, 0.2)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1l718")
