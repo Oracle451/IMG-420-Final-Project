@@ -14,4 +14,8 @@ position = Vector2(-0.5, 0)
 shape = SubResource("RectangleShape2D_u8vuu")
 
 [node name="DistortionSprite2D" type="DistortionSprite2D" parent="."]
+elasticity = 75.9
+damping = 20.7
+noise_amplitude = 19.1
+noise_speed = 7.22
 texture = ExtResource("2_g2els")
