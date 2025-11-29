@@ -1,14 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnkuu6e83c5oq"]
+[gd_scene load_steps=5 format=3 uid="uid://dnkuu6e83c5oq"]
 
 [ext_resource type="Script" uid="uid://cfhvt0xkfhyxm" path="res://scripts/Player.cs" id="1_3vyb7"]
 [ext_resource type="Texture2D" uid="uid://dvr3wxhw35572" path="res://assets/art/Slime128.png" id="2_g2els"]
+[ext_resource type="Script" uid="uid://dy0mjb107mgiy" path="res://scripts/CameraZoom.cs" id="3_qhqgy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
 radius = 59.0
 height = 120.0
 
 [node name="Player" type="CharacterBody2D"]
+scale = Vector2(0.75, 0.75)
 script = ExtResource("1_3vyb7")
+metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_g2els")
@@ -19,3 +22,6 @@ damping = 10.0
 noise_amplitude = 30.0
 noise_speed = 10.0
 texture = ExtResource("2_g2els")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("3_qhqgy")

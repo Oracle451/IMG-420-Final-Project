@@ -6,7 +6,7 @@ public partial class Player : CharacterBody2D
 	// Set the players speed, jump velocity, and gravity
 	[ExportGroup("Movement")]
 	[Export] public float Speed = 300f;
-	[Export] public float JumpVelocity = -800f;
+	[Export] public float JumpVelocity = -500f;
 	[Export] public float Gravity = 980f;
 	
 	// Sets the dash speed, the duration, and the cooldown
@@ -175,14 +175,14 @@ public partial class Player : CharacterBody2D
 	// controls what happens while the slime is dashing
 	private void HandleDashState(float delta)
 	{
-		// While dashing, ignore gravity and lock velocity
+		// ignores gravity while dashing
 		Velocity = _dashDirection * DashSpeed;
 		
 		_dashTimer -= delta;
 		if (_dashTimer <= 0)
 		{
 			_isDashing = false;
-			// Cut velocity slightly so we don't fly off instantly after dash ends
+			// cut velocity after dash ends
 			Velocity *= 0.5f; 
 		}
 	}
