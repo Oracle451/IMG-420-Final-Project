@@ -64,8 +64,28 @@ public partial class Player : CharacterBody2D
 		}
 		// moved the slime effects to a function to clear up this function
 		HandleSlimeEffects();
+		PushRigidBodies();
 		MoveAndSlide();
 	}
+	
+	private void PushRigidBodies()
+{
+	// Cast to see if we are touching anything
+	var collisionCount = GetSlideCollisionCount();
+	for (int i = 0; i < collisionCount; i++)
+	{
+		KinematicCollision2D collision = GetSlideCollision(i);
+
+		if (collision.GetCollider() is RigidBody2D rb)
+		{
+			// Direction of the push
+			Vector2 pushDir = collision.GetNormal() * -1.0f;
+
+			// Apply force proportional to player velocity
+			rb.ApplyCentralImpulse(pushDir * 40f);
+		}
+	}
+}
 	
 	// this is the function that handles all normal player movement
 	private void NormalMovement(float d)

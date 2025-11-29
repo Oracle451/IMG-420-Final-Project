@@ -61,6 +61,15 @@ texture_normal = ExtResource("4_wu84c")
 texture_hover = ExtResource("5_8ln24")
 stretch_mode = 5
 
+[node name="StartButtonDistorted2" type="DistortionSprite2D" parent="VBoxContainer/StartButton"]
+elasticity = 50.0
+damping = 5.0
+noise_amplitude = 6.0
+noise_speed = 2.0
+texture = ExtResource("4_wu84c")
+position = Vector2(174, 27)
+scale = Vector2(1.6, 1.5)
+
 [node name="StartLabel" type="Label" parent="VBoxContainer/StartButton"]
 layout_mode = 1
 anchors_preset = 8
@@ -85,6 +94,14 @@ size_flags_vertical = 3
 texture_normal = ExtResource("4_wu84c")
 texture_hover = ExtResource("5_8ln24")
 stretch_mode = 5
+
+[node name="QuitButtonDistorted" type="DistortionSprite2D" parent="VBoxContainer/ExitButton"]
+elasticity = 25.0
+damping = 5.0
+noise_speed = 3.0
+texture = ExtResource("4_wu84c")
+position = Vector2(174, 27)
+scale = Vector2(1.6, 1.5)
 
 [node name="ExitLabel" type="Label" parent="VBoxContainer/ExitButton"]
 layout_mode = 1
