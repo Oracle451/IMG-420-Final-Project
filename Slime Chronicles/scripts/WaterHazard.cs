@@ -30,7 +30,7 @@ public partial class WaterHazard : Node2D
 		// Create a 1-second timer (one-shot)
 		Timer timer = new Timer
 		{
-			WaitTime = 1.0f,
+			WaitTime = 0.5f,
 			OneShot = true
 		};
 
