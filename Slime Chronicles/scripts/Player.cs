@@ -6,7 +6,7 @@ public partial class Player : CharacterBody2D
 	// Set the players speed, jump velocity, and gravity
 	[ExportGroup("Movement")]
 	[Export] public float Speed = 300f;
-	[Export] public float JumpVelocity = -400f;
+	[Export] public float JumpVelocity = -800f;
 	[Export] public float Gravity = 980f;
 	
 	// Sets the dash speed, the duration, and the cooldown
