@@ -130,7 +130,7 @@ offset_right = 1447.0
 offset_bottom = 417.0
 theme_override_fonts/font = ExtResource("4_c6gv3")
 theme_override_font_sizes/font_size = 20
-text = "The water can be sentient too."
+text = "Make sure to look out for Living Tar!"
 horizontal_alignment = 1
 autowrap_mode = 2
 

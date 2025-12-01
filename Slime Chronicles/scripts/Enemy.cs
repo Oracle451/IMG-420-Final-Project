@@ -5,14 +5,22 @@ public partial class Enemy : CharacterBody2D
 {
 	[Export] public float Speed = 100.0f;
 	[Export] public float Gravity = 980.0f;
+	
+	[ExportGroup("Tar Deformation")]
+	[Export] public float MoveStretch = 0.25f;
+	[Export] public float WallImpactSquash = 0.6f;
+	[Export] public float IdleWobble = 0.15f;
 
 	private float _direction = 1.0f;
 
-	private Sprite2D _sprite;
+	private Node _distortion;
 
 	public override void _Ready()
 	{
-		_sprite = GetNode<Sprite2D>("Sprite2D");
+		_distortion = GetNode("DistortionSprite2D");
+
+		// reset mesh on spawn
+		_distortion?.Call("reset_mesh");
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -32,15 +40,55 @@ public partial class Enemy : CharacterBody2D
 			// Flip direction
 			_direction *= -1;
 			
-			// Flip the visual sprite
-			_sprite.FlipH = (_direction < 0);
+			// Apply distortion on impact
+			ApplyClampedImpulse(
+				new Vector2(_direction * 24, 0),     // strong push
+				new Vector2(-_direction * MoveStretch, -WallImpactSquash)
+			);
 		}
 
 		// 3. Apply Horizontal Movement
 		velocity.X = Speed * _direction;
+		
+		// Apply movement stretch
+		ApplyClampedImpulse(
+			new Vector2(_direction * 20, 0),
+			new Vector2(_direction * MoveStretch, 0)
+		);
+		
+		// Idle wobble
+		float t = Time.GetTicksMsec() * 0.001f;
+		Vector2 wobble = new Vector2(
+			Mathf.Sin(t * 1.4f) * 0.3f,
+			Mathf.Cos(t * 2.0f) * 0.25f
+		);
+		ApplyClampedImpulse(Vector2.Zero, wobble * IdleWobble);
 
 		// 4. Move the enemy
 		Velocity = velocity;
 		MoveAndSlide();
 	}
+	
+	private void ApplyClampedImpulse(Vector2 point, Vector2 desiredForce)
+	{
+		float length = desiredForce.Length();
+		if (length < 0.001f) return;
+
+		float clampedLength = Mathf.Clamp(length, 0.05f, 0.45f);
+		Vector2 finalForce = desiredForce.Normalized() * clampedLength;
+
+		_distortion?.Call("apply_impulse", point, finalForce);
+	}
+	
+	private void OnBodyEntered(Node body)
+	{
+		if (!body.IsInGroup("player"))
+			return;
+			
+		if (body is CharacterBody2D player)
+		{
+			player.GlobalPosition = new Vector2(250, 1654);
+		}
+	}
+
 }
