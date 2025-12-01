@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://bu7jaf886j8jb"]
+
+[ext_resource type="Texture2D" uid="uid://c05j81tljkw1a" path="res://assets/art/SlimeBlock.png" id="1_hf8mt"]
+[ext_resource type="Script" uid="uid://20vhd7sh5l66" path="res://scripts/Bullet.cs" id="1_p1sfj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hf8mt"]
+size = Vector2(53, 50)
+
+[node name="Bullet" type="Area2D"]
+script = ExtResource("1_p1sfj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("1_hf8mt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_hf8mt")
+
+[connection signal="body_entered" from="." to="." method="OnBodyEntered"]

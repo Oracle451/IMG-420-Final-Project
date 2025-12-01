@@ -145,10 +145,10 @@ text = "Good job! Go through the pipe to begin!"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Node2D" parent="." instance=ExtResource("5_c6gv3")]
+[node name="WaterHazard1" parent="." instance=ExtResource("5_c6gv3")]
 position = Vector2(408, 1197)
 
-[node name="Node2D2" parent="." instance=ExtResource("5_c6gv3")]
+[node name="waterHazard2" parent="." instance=ExtResource("5_c6gv3")]
 position = Vector2(614, 1198)
 
 [node name="SlimeBlock2" parent="." instance=ExtResource("6_vsfy4")]
