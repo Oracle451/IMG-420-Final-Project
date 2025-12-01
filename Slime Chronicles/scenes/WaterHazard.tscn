@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dfq41moiefjbv"]
 
-[ext_resource type="Script" uid="uid://x0sgmyk8fcvi" path="res://scenes/WaterHazard.cs" id="1_67n05"]
+[ext_resource type="Script" uid="uid://x0sgmyk8fcvi" path="res://scripts/WaterHazard.cs" id="1_67n05"]
 [ext_resource type="Texture2D" uid="uid://do86yoot3rhpo" path="res://assets/art/Water.png" id="1_lstmf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lstmf"]

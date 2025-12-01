@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://yx5stlu5ot8f"]
 
-[ext_resource type="Script" uid="uid://b0sp08ffkiqjm" path="res://SlimeBlock.cs" id="1_6efag"]
+[ext_resource type="Script" uid="uid://b0sp08ffkiqjm" path="res://scripts/SlimeBlock.cs" id="1_6efag"]
 [ext_resource type="Texture2D" uid="uid://c05j81tljkw1a" path="res://assets/art/SlimeBlock.png" id="2_7lbu2"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_7lbu2"]
