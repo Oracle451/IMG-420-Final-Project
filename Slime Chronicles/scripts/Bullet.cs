@@ -1,20 +1,32 @@
-using UnityEngine;
+using Godot;
+using System;
 
-public class Bullet : MonoBehaviour
+public partial class Bullet : Area2D
 {
-    public float speed = 10f;   
-    public Vector2 direction;   
-    public float life = 2f;    
+    [Export]
+    // bullet speed in pixels/sec
+    public float speed = 400f;  
 
-    void Start()
-    {
-        // destroy bullet so it doesn't sit in the scene forever
-        Destroy(gameObject, life);
-    }
+    [Export]
+    // set by player
+    public Vector2 direction;    
 
-    void Update()
+    [Export]
+     // delete after a bit
+    public float life = 2f;     
+
+    private float timer = 0f;
+
+    public override void _Process(double delta)
     {
-        // just move the bullet in whatever direction it was given
-        transform.Translate(direction * speed * Time.deltaTime);
+        // just move in whatever direction the player set
+        Position += direction * speed * (float)delta;
+
+        // keep track of how long we've been alive
+        timer += (float)delta;
+        if (timer >= life)
+        {
+            QueueFree();
+        }
     }
 }
