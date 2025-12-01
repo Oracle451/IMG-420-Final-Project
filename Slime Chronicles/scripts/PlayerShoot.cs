@@ -13,7 +13,7 @@ public partial class PlayerShoot : Node2D
 
 	[Export]
 	// same as Unity
-	public float fireRate = 0.25f;      
+	public float fireRate = 1.0f;      
 
 	private float nextShootTime = 0f;
 

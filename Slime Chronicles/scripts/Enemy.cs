@@ -90,5 +90,12 @@ public partial class Enemy : CharacterBody2D
 			player.GlobalPosition = new Vector2(250, 1654);
 		}
 	}
+	
+	public void Die()
+	{
+		// could later play animation, sound, particles
+		QueueFree();
+	}
+
 
 }
