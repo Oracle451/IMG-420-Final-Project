@@ -1,8 +1,11 @@
-[gd_scene load_steps=5 format=3 uid="uid://dnkuu6e83c5oq"]
+[gd_scene load_steps=8 format=3 uid="uid://dnkuu6e83c5oq"]
 
 [ext_resource type="Script" uid="uid://cfhvt0xkfhyxm" path="res://scripts/Player.cs" id="1_3vyb7"]
 [ext_resource type="Texture2D" uid="uid://dvr3wxhw35572" path="res://assets/art/Slime128.png" id="2_g2els"]
 [ext_resource type="Script" uid="uid://dy0mjb107mgiy" path="res://scripts/CameraZoom.cs" id="3_qhqgy"]
+[ext_resource type="AudioStream" uid="uid://c2vngkt0sdryp" path="res://assets/sfx/SlimeBoost.mp3" id="4_dqkch"]
+[ext_resource type="AudioStream" uid="uid://cc33qxm2uof6q" path="res://assets/sfx/SlimeHit.mp3" id="5_qlg0r"]
+[ext_resource type="AudioStream" uid="uid://m375qtmmkmc6" path="res://assets/sfx/SlimePop.mp3" id="5_tuyoq"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
 radius = 59.0
@@ -25,3 +28,13 @@ texture = ExtResource("2_g2els")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("3_qhqgy")
+
+[node name="DashSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_dqkch")
+bus = &"SFX"
+
+[node name="PopSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_tuyoq")
+
+[node name="HitSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_qlg0r")
