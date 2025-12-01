@@ -15,7 +15,7 @@ public partial class PlayerShoot : Node2D
     // same as Unity
     public float fireRate = 0.25f;      
 
-    private float nextShootTime = 0f;
+	private float nextShootTime = 0f;
 
     public override void _Process(double delta)
     {
@@ -56,3 +56,4 @@ public partial class PlayerShoot : Node2D
         GetTree().CurrentScene.AddChild(b);
     }
 }
+*/

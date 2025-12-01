@@ -30,12 +30,15 @@ public partial class Player : CharacterBody2D
 	private float _dashTimer = 0.0f;
 	private float _canDashTimer = 0.0f;
 	private Vector2 _dashDirection;
+	private AudioStreamPlayer _dashSound;
+	
 
 	public override void _Ready()
 	{
 		// Get the sprite and set the mesh to its original state
 		_distortion = GetNode("DistortionSprite2D");
 		_distortion?.Call("reset_mesh");
+		_dashSound = GetNode<AudioStreamPlayer>("DashSound");
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -69,23 +72,23 @@ public partial class Player : CharacterBody2D
 	}
 	
 	private void PushRigidBodies()
-{
-	// Cast to see if we are touching anything
-	var collisionCount = GetSlideCollisionCount();
-	for (int i = 0; i < collisionCount; i++)
 	{
-		KinematicCollision2D collision = GetSlideCollision(i);
-
-		if (collision.GetCollider() is RigidBody2D rb)
+		// Cast to see if we are touching anything
+		var collisionCount = GetSlideCollisionCount();
+		for (int i = 0; i < collisionCount; i++)
 		{
-			// Direction of the push
-			Vector2 pushDir = collision.GetNormal() * -1.0f;
+			KinematicCollision2D collision = GetSlideCollision(i);
 
-			// Apply force proportional to player velocity
-			rb.ApplyCentralImpulse(pushDir * 40f);
+			if (collision.GetCollider() is RigidBody2D rb)
+			{
+				// Direction of the push
+				Vector2 pushDir = collision.GetNormal() * -1.0f;
+
+				// Apply force proportional to player velocity
+				rb.ApplyCentralImpulse(pushDir * 40f);
+			}
 		}
 	}
-}
 	
 	// this is the function that handles all normal player movement
 	private void NormalMovement(float d)
@@ -163,6 +166,7 @@ public partial class Player : CharacterBody2D
 		_isDashing = true;
 		_dashTimer = DashDuration;
 		_canDashTimer = DashCooldown;
+		_dashSound.Play();
 
 		// check which way the player is facing
 		float inputX = Input.GetAxis("ui_left", "ui_right");
