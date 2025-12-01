@@ -3,7 +3,7 @@ using System;
 
 public partial class Bullet : Area2D
 {
-	[Export] public float speed = 400f;
+	[Export] public float speed = 800f;
 	[Export] public Vector2 direction;
 	[Export] public float life = 2f;
 
