@@ -1,39 +1,59 @@
-/*
-using UnityEngine;
+using Godot;
+using System;
 
-public class PlayerShoot : MonoBehaviour
+public partial class PlayerShoot : Node2D
 {
-	public GameObject bulletPrefab;      
-	public Transform firePoint;         
-	public float fireRate = 0.25f;   
+    [Export]
+    // drag Bullet.tscn here
+    public PackedScene bulletPrefab;    
+
+    [Export]
+        // the "muzzle" 
+    public Node2D firePoint;        
+
+    [Export]
+    // same as Unity
+    public float fireRate = 0.25f;      
 
 	private float nextShootTime = 0f;
 
-	void Update()
-	{
-		// left click shoots 
-		if (Input.GetMouseButton(0))
-		{
-			if (Time.time >= nextShootTime)
-			{
-				Shoot();
-				nextShootTime = Time.time + fireRate;
-			}
-		}
-	}
+    public override void _Process(double delta)
+    {
+        if (nextShootTime > 0)
+            nextShootTime -= (float)delta;
 
-	void Shoot()
-	{
-		// spawn the bullet at the firepoint
-		GameObject b = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        // left click shoots (using input map action)
+        if (Input.IsActionPressed("shoot"))
+        {
+            if (nextShootTime <= 0f)
+            {
+                Shoot();
+                nextShootTime = fireRate;
+            }
+        }
+    }
 
-		// figure out where mouse is in world space
-		Vector3 mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		Vector2 dir = (mouse - firePoint.position).normalized;
+    private void Shoot()
+    {
+        // spawn bullet from the PackedScene
+        Bullet b = bulletPrefab.Instantiate() as Bullet;
+        if (b == null)
+        {
+            GD.Print("Bullet prefab wasn't set correctly.");
+            return;
+        }
 
-		// give bullet a direction to travel
-		Bullet bulletScript = b.GetComponent<Bullet>();
-		bulletScript.direction = dir;
-	}
+        // set bullet position
+        b.GlobalPosition = firePoint.GlobalPosition;
+
+        // get mouse pos in world space
+        Vector2 mousePos = GetGlobalMousePosition();
+
+        // direction from fire point to mouse
+        b.direction = (mousePos - firePoint.GlobalPosition).Normalized();
+
+        // add to the current scene tree
+        GetTree().CurrentScene.AddChild(b);
+    }
 }
 */
