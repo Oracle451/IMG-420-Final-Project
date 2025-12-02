@@ -27,14 +27,16 @@ public partial class Bullet : Area2D
 	private void OnBodyEntered(Node body)
 	{
 		// If enemy detected → kill enemy
-		if (body.IsInGroup("enemy"))
+		if (body is Enemy enemy)
 		{
-			body.QueueFree();   // remove the enemy
+			// hide and remove enemy
+			enemy.Visible = false;
+			enemy.Die();
 		}
-		
 		if (!body.IsInGroup("player"))
 		{
-			QueueFree();        // remove bullet after impact
+			// remove bullet
+			QueueFree();
 		}
 	}
 }

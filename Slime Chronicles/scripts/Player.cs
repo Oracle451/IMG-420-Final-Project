@@ -1,6 +1,13 @@
 // Handles Player movement and applying impulses
 using Godot;
 
+public enum DeathType 
+{
+	Generic,
+	Water,
+	EnemyKill
+}
+
 public partial class Player : CharacterBody2D
 {
 	// Set the players speed, jump velocity, and gravity
@@ -31,6 +38,8 @@ public partial class Player : CharacterBody2D
 	private float _canDashTimer = 0.0f;
 	private Vector2 _dashDirection;
 	private AudioStreamPlayer _dashSound;
+	private AudioStreamPlayer _popSound;
+	private AudioStreamPlayer _hitSound;
 	
 
 	public override void _Ready()
@@ -39,6 +48,8 @@ public partial class Player : CharacterBody2D
 		_distortion = GetNode("DistortionSprite2D");
 		_distortion?.Call("reset_mesh");
 		_dashSound = GetNode<AudioStreamPlayer>("DashSound");
+		_popSound = GetNode<AudioStreamPlayer>("PopSound");
+		_hitSound = GetNode<AudioStreamPlayer>("HitSound");
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -208,6 +219,22 @@ public partial class Player : CharacterBody2D
 			_isDashing = false;
 			// cut velocity after dash ends
 			Velocity *= 0.5f; 
+		}
+	}
+	
+	public void Die(DeathType typeOfDeath)
+	{
+		switch (typeOfDeath)
+		{
+			case DeathType.Water:
+				_hitSound.Play();
+				break;
+			case DeathType.EnemyKill:
+				_popSound.Play();
+				break;
+			case DeathType.Generic:
+			default:
+				break;
 		}
 	}
 }

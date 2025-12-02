@@ -12,11 +12,13 @@ public partial class Enemy : CharacterBody2D
 	[Export] public float IdleWobble = 0.15f;
 
 	private float _direction = 1.0f;
-
+	private AudioStreamPlayer _popSound;
 	private Node _distortion;
+	private bool _isDead = false;
 
 	public override void _Ready()
 	{
+		_popSound = GetNode<AudioStreamPlayer>("PopSound");
 		_distortion = GetNode("DistortionSprite2D");
 
 		// reset mesh on spawn
@@ -25,6 +27,8 @@ public partial class Enemy : CharacterBody2D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_isDead) return;
+		
 		Vector2 velocity = Velocity;
 
 		// 1. Apply Gravity
@@ -85,17 +89,30 @@ public partial class Enemy : CharacterBody2D
 		if (!body.IsInGroup("player"))
 			return;
 			
-		if (body is CharacterBody2D player)
+		if (body is Player player)
 		{
+			player.Die(DeathType.EnemyKill);
 			player.GlobalPosition = new Vector2(250, 1654);
 		}
 	}
-	
 	public void Die()
 	{
-		// could later play animation, sound, particles
+		if (_isDead) return;
+		_isDead = true;
+		CallDeferred(nameof(_DeathSequence));
+	}
+	private void _DeathSequence()
+	{
+		SetProcess(false);
+		SetPhysicsProcess(false);
+		
+		GetNode<CollisionShape2D>("CollisionShape2D").Disabled = true; 
+		_popSound.Finished += OnPopSoundFinished;
+		_popSound.Play();
+	}
+	private void OnPopSoundFinished()
+	{
+		_popSound.Finished -= OnPopSoundFinished;
 		QueueFree();
 	}
-
-
 }

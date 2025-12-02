@@ -40,6 +40,8 @@ stream = ExtResource("5_tuyoq")
 
 [node name="HitSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_qlg0r")
+volume_db = -10.0
+bus = &"SFX"
 
 [node name="PlayerShoot" type="Node2D" parent="." node_paths=PackedStringArray("firePoint")]
 script = ExtResource("7_fjrip")

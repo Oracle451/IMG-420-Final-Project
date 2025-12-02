@@ -164,4 +164,7 @@ position = Vector2(1119, 325)
 position = Vector2(1899, 110)
 scale = Vector2(4, 4)
 
+[node name="Enemy2" parent="." instance=ExtResource("7_w53h0")]
+position = Vector2(1058, 1675)
+
 [connection signal="PlayerEnteredPipe" from="ExitPipe" to="." method="OnPipeActivated"]

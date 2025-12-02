@@ -20,10 +20,14 @@ public partial class WaterHazard : Node2D
 	{
 		if (!body.IsInGroup("player"))
 			return;
-
+		
 		// Splash right away
 		TriggerSplash(body);
-
+		if (body is Player player)
+		{
+			player.Die(DeathType.Water);
+		}
+		
 		// Store player so the timer callback knows who to move
 		_playerPendingTeleport = body;
 

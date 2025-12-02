@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cp6tdqcibsn5q"]
+[gd_scene load_steps=6 format=3 uid="uid://cp6tdqcibsn5q"]
 
 [ext_resource type="Script" uid="uid://drg1627omy5rf" path="res://scripts/Enemy.cs" id="1_md0e3"]
 [ext_resource type="Texture2D" uid="uid://bxlrcxgvr7dv1" path="res://assets/art/LivingTar128.png" id="3_4ra3w"]
+[ext_resource type="AudioStream" uid="uid://m375qtmmkmc6" path="res://assets/sfx/SlimePop.mp3" id="3_5uy6h"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_c4w8v"]
 size = Vector2(121.429, 117.143)
@@ -30,5 +31,9 @@ scale = Vector2(0.7, 0.7)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(0.5, -1)
 shape = SubResource("RectangleShape2D_md0e3")
+
+[node name="PopSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_5uy6h")
+bus = &"SFX"
 
 [connection signal="body_entered" from="Area2D" to="." method="OnBodyEntered"]
