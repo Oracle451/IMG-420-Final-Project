@@ -41,6 +41,16 @@ public partial class Player : CharacterBody2D
 	private AudioStreamPlayer _popSound;
 	private AudioStreamPlayer _hitSound;
 	
+	// for the player scaling
+	private readonly Vector2 DEFAULT_SCALE = Vector2.One;
+	private readonly Vector2 SMALL_SCALE = new Vector2(0.5f, 0.5f);
+	private readonly Vector2 BIG_SCALE = new Vector2(1.5f, 1.5f);
+	private const float SCALE_LERP_SPEED = 5.0f;
+	
+	private float _defaultShapeRadius;
+	private float _defaultShapeHeight;
+	private CollisionShape2D _collisionShape;
+	private Vector2 _targetScale = Vector2.One;
 
 	public override void _Ready()
 	{
@@ -50,6 +60,20 @@ public partial class Player : CharacterBody2D
 		_dashSound = GetNode<AudioStreamPlayer>("DashSound");
 		_popSound = GetNode<AudioStreamPlayer>("PopSound");
 		_hitSound = GetNode<AudioStreamPlayer>("HitSound");
+		
+		_collisionShape = GetNode<CollisionShape2D>("CollisionShape2D");
+		if (_collisionShape.Shape is CapsuleShape2D capsuleShape)
+		{
+			_defaultShapeRadius = capsuleShape.Radius;
+			_defaultShapeHeight = capsuleShape.Height;
+		}
+		
+		_targetScale = DEFAULT_SCALE;
+	}
+	
+	public override void _Process(double delta)
+	{
+		HandleScaling((float)delta);
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -219,6 +243,65 @@ public partial class Player : CharacterBody2D
 			_isDashing = false;
 			// cut velocity after dash ends
 			Velocity *= 0.5f; 
+		}
+	}
+	// handles the scaling for slime
+	private void HandleScaling(float delta)
+	{
+		if (Input.IsKeyPressed(Key.Q))
+		{
+			_targetScale = SMALL_SCALE;
+		}
+		else if (Input.IsKeyPressed(Key.R))
+		{
+			_targetScale = BIG_SCALE;
+		}
+		else
+		{
+			_targetScale = DEFAULT_SCALE;
+		}
+		
+		// scaling the sprite
+		if (_distortion is Node2D distortion2D)
+		{
+			distortion2D.Scale = distortion2D.Scale.Lerp(
+				_targetScale,
+				delta * SCALE_LERP_SPEED
+			);
+		}
+		
+		// scaling the collision shape
+		if (_collisionShape?.Shape is CapsuleShape2D capsuleShape)
+		{
+			float targetRadius = _defaultShapeRadius * _targetScale.X; // Assuming X and Y scale equally
+			float targetHeight = _defaultShapeHeight * _targetScale.Y;
+
+			// Lerp the current Radius towards the target Radius
+			capsuleShape.Radius = Mathf.Lerp(
+				capsuleShape.Radius,
+				targetRadius,
+				delta * SCALE_LERP_SPEED
+			);
+
+			// Lerp the current Height towards the target Height
+			capsuleShape.Height = Mathf.Lerp(
+				capsuleShape.Height,
+				targetHeight,
+				delta * SCALE_LERP_SPEED
+			);
+			
+			float halfDefaultHeight = (_defaultShapeHeight / 2.0f) + _defaultShapeRadius;
+			float halfCurrentHeight = (capsuleShape.Height / 2.0f) + capsuleShape.Radius;
+			
+			// The amount to shift vertically (difference between half heights)
+			float correctionY = halfDefaultHeight - halfCurrentHeight;
+			
+			// Apply the correction to the local position of the CharacterBody2D
+			// Use Lerp for smooth position correction too
+			Position = Position.Lerp(
+				new Vector2(Position.X, Position.Y + correctionY),
+				delta * SCALE_LERP_SPEED
+			);
 		}
 	}
 	
