@@ -112,10 +112,19 @@ Fully resets all vertices and velocities.
 
 ### Other getters/setters
 
-Includes: - `set_texture` - `get_texture` - `set_grid_size` -
-`get_grid_size` - `set_elasticity` - `get_elasticity` - `set_damping` -
-`get_damping` - `set_noise_strength` - `get_noise_strength` -
-`set_noise_speed` - `get_noise_speed`
+Includes: 
+- `set_texture`
+- `get_texture`
+- `set_grid_size`
+- `get_grid_size`
+- `set_elasticity`
+- `get_elasticity`
+- `set_damping`
+- `get_damping`
+- `set_noise_strength`
+- `get_noise_strength`
+- `set_noise_speed`
+- `get_noise_speed`
 
 ------------------------------------------------------------------------
 
@@ -159,20 +168,20 @@ func _input(event):
 
 ### Soft slime
 
--   Grid: 18×18\
--   Elasticity: 10--20\
--   Damping: 4--10\
+-   Grid: 18×18
+-   Elasticity: 10--20
+-   Damping: 4--10
 -   Noise: 2--5
 
 ### Water surface
 
--   Grid: 32×32\
--   Elasticity: 3--8\
--   Noise: medium\
+-   Grid: 32×32
+-   Elasticity: 3--8
+-   Noise: medium
 -   Damping: low
 
 ### Cartoon impacts
 
--   Elasticity: 25--40\
--   Damping: medium\
+-   Elasticity: 25--40
+-   Damping: medium
 -   Noise: off
