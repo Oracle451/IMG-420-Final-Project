@@ -29,7 +29,6 @@ tile_map_data = PackedByteArray("AAAAABoAAAAAAAAAAFAAABsAAAAAAAAAAFAAABwAAAAAAAA
 tile_set = ExtResource("3_63ct5")
 
 [node name="Player" parent="." instance=ExtResource("4_5tayq")]
-z_index = 1
 position = Vector2(268, 1654)
 
 [node name="WelcomeTip" type="Label" parent="."]
