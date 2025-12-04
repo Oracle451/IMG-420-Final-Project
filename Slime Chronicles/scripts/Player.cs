@@ -44,7 +44,7 @@ public partial class Player : CharacterBody2D
 	// for the player scaling
 	private readonly Vector2 DEFAULT_SCALE = Vector2.One;
 	private readonly Vector2 SMALL_SCALE = new Vector2(0.5f, 0.5f);
-	private readonly Vector2 BIG_SCALE = new Vector2(1.5f, 1.5f);
+	private readonly Vector2 BIG_SCALE = new Vector2(1.8f, 1.8f);
 	private const float SCALE_LERP_SPEED = 5.0f;
 	
 	private float _defaultShapeRadius;
@@ -273,34 +273,30 @@ public partial class Player : CharacterBody2D
 		// scaling the collision shape
 		if (_collisionShape?.Shape is CapsuleShape2D capsuleShape)
 		{
-			float targetRadius = _defaultShapeRadius * _targetScale.X; // Assuming X and Y scale equally
+			float halfCurrentHeightBeforeUpdate = (capsuleShape.Height / 2.0f) + capsuleShape.Radius;
+			
+			// lerping the dimensions
+			float targetRadius = _defaultShapeRadius * _targetScale.X;
 			float targetHeight = _defaultShapeHeight * _targetScale.Y;
 
-			// Lerp the current Radius towards the target Radius
 			capsuleShape.Radius = Mathf.Lerp(
 				capsuleShape.Radius,
 				targetRadius,
 				delta * SCALE_LERP_SPEED
 			);
 
-			// Lerp the current Height towards the target Height
 			capsuleShape.Height = Mathf.Lerp(
 				capsuleShape.Height,
 				targetHeight,
 				delta * SCALE_LERP_SPEED
 			);
 			
-			float halfDefaultHeight = (_defaultShapeHeight / 2.0f) + _defaultShapeRadius;
-			float halfCurrentHeight = (capsuleShape.Height / 2.0f) + capsuleShape.Radius;
-			
-			// The amount to shift vertically (difference between half heights)
-			float correctionY = halfDefaultHeight - halfCurrentHeight;
-			
-			// Apply the correction to the local position of the CharacterBody2D
-			// Use Lerp for smooth position correction too
+			float halfNewHeight = (capsuleShape.Height / 2.0f) + capsuleShape.Radius;
+			float correctionY = halfNewHeight - halfCurrentHeightBeforeUpdate;
+
 			Position = Position.Lerp(
 				new Vector2(Position.X, Position.Y + correctionY),
-				delta * SCALE_LERP_SPEED
+				delta * SCALE_LERP_SPEED * 2.0f
 			);
 		}
 	}
