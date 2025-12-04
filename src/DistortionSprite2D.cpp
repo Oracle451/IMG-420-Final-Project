@@ -5,8 +5,13 @@
 
 using namespace godot;
 
-void DistortionSprite2D::_bind_methods() {
-    // Bind ALL custom methods FIRST
+// -------------------------
+// BINDING & PROPERTY SETUP
+// -------------------------
+
+void DistortionSprite2D::_bind_methods()
+{
+    // Bind ALL custom methods
     ClassDB::bind_method(D_METHOD("apply_impulse", "point", "force"), &DistortionSprite2D::apply_impulse);
     ClassDB::bind_method(D_METHOD("reset_mesh"), &DistortionSprite2D::reset_mesh);
     ClassDB::bind_method(D_METHOD("set_texture", "texture"), &DistortionSprite2D::set_texture);
@@ -22,7 +27,7 @@ void DistortionSprite2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_noise_speed", "value"), &DistortionSprite2D::set_noise_speed);
     ClassDB::bind_method(D_METHOD("get_noise_speed"), &DistortionSprite2D::get_noise_speed);
 
-    // NOW add properties (they reference the bound methods)
+    // Expose all editable properties to the godot inspector
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "elasticity", PROPERTY_HINT_RANGE, "0,100,0.1"), "set_elasticity", "get_elasticity");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "damping", PROPERTY_HINT_RANGE, "0,50,0.1"), "set_damping", "get_damping");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "noise_amplitude", PROPERTY_HINT_RANGE, "0,30,0.1"), "set_noise_strength", "get_noise_strength");
@@ -31,8 +36,14 @@ void DistortionSprite2D::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "texture", PROPERTY_HINT_RESOURCE_TYPE, "Texture2D"), "set_texture", "get_texture");
 }
 
-DistortionSprite2D::DistortionSprite2D() {
+// -------------------------
+// CONSTRUCTOR
+// -------------------------
+
+DistortionSprite2D::DistortionSprite2D()
+{
     // Classic Perlin permutation table (256 values, duplicated to 512)
+    // This generates repeatable semi random gradients for noise
     static const int permutation[256] = {
         151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
         190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,
@@ -46,58 +57,100 @@ DistortionSprite2D::DistortionSprite2D() {
         195,78,66,215,61,156,180
     };
 
-    for (int i = 0; i < 256; i++) {
+    // Duplicate into 512 entries for fast lookup
+    for (int i = 0; i < 256; i++)
+    {
         perm[i] = perm[i + 256] = permutation[i];
     }
 }
 
-void DistortionSprite2D::set_grid_size(const Vector2i &size) {
+// -------------------------
+// PROPERTY SETTERS
+// -------------------------
+
+void DistortionSprite2D::set_grid_size(const Vector2i &size)
+{
+    // Clamp grid resolution and mark mesh to be rebuilt
     grid_size.x = CLAMP(size.x, 3, 64);
     grid_size.y = CLAMP(size.y, 3, 64);
     needs_rebuild = true;
 }
 
-void DistortionSprite2D::set_texture(const Ref<Texture2D> &tex) {
+void DistortionSprite2D::set_texture(const Ref<Texture2D> &tex)
+{
     texture = tex;
-    if (texture.is_valid()) {
+    // Updates extends so points are generated correctly
+    if (texture.is_valid())
+    {
         extents = texture->get_size() / 2.0f;
     }
     needs_rebuild = true;
 }
 
-void DistortionSprite2D::_ready() {
-    if (needs_rebuild || rest_vertices.size() == 0) {
+// -------------------------
+// NODE LIFECYCLE
+// -------------------------
+
+void DistortionSprite2D::_ready()
+{
+    // Rebuilds the mesh if the texture changed or the mesh is empty
+    if (needs_rebuild || rest_vertices.size() == 0)
+    {
         build_grid();
         needs_rebuild = false;
     }
 }
 
-void DistortionSprite2D::_process(double delta) {
+void DistortionSprite2D::_process(double delta)
+{
+    // Run physics simulation on the grid
     integrate(static_cast<float>(delta));
+    // Trigger Godot to redraw the deformed mesh
     queue_redraw();
 }
 
-void DistortionSprite2D::apply_impulse(const Vector2 &point, const Vector2 &force) {
+// -------------------------
+// DISTORTION INTERACTIONS
+// -------------------------
+
+void DistortionSprite2D::apply_impulse(const Vector2 &point, const Vector2 &force)
+{
+    // Apply a splash of velocity to nearby grid points
     const float radius = 120.0f;
-    for (int i = 0; i < vertices.size(); i++) {
+    
+    for (int i = 0; i < vertices.size(); i++)
+    {
         float dist = vertices[i].distance_to(point);
-        if (dist < radius) {
+        if (dist < radius)
+        {
+            // Smooth the radial falloff
             float falloff = 1.0f - (dist / radius);
-            falloff = falloff * falloff; // smooth
+            falloff = falloff * falloff;
+            // Add force scaled by falloff
             velocities[i] = velocities[i] + force * falloff * 40.0f;
         }
     }
 }
 
-void DistortionSprite2D::reset_mesh() {
+void DistortionSprite2D::reset_mesh()
+{
+    // Reset vertecies to rest position and zero out velocities
     vertices = rest_vertices;
-    for (int i = 0; i < velocities.size(); i++) {
+    for (int i = 0; i < velocities.size(); i++)
+    {
         velocities[i] = Vector2(0, 0);
     }
 }
 
-void DistortionSprite2D::build_grid() {
-    if (texture.is_valid()) {
+// -------------------------
+// GRID CREATION
+// -------------------------
+
+void DistortionSprite2D::build_grid()
+{
+    // Recompute texture extents (half width and height)
+    if (texture.is_valid())
+    {
         extents = texture->get_size() / 2.0f;
     }
 
@@ -105,23 +158,31 @@ void DistortionSprite2D::build_grid() {
     int rows = grid_size.y;
     int count = cols * rows;
 
+    // Resize arrays to correct size
     rest_vertices.resize(count);
     vertices.resize(count);
     velocities.resize(count);
     uvs.resize(count);
 
+    // Direct write access
     Vector2 *rest_w = rest_vertices.ptrw();
     Vector2 *pos_w  = vertices.ptrw();
     Vector2 *vel_w  = velocities.ptrw();
     Vector2 *uv_w   = uvs.ptrw();
 
-    for (int y = 0; y < rows; y++) {
-        for (int x = 0; x < cols; x++) {
+    // Fill mesh grid
+    for (int y = 0; y < rows; y++)
+    {
+        for (int x = 0; x < cols; x++)
+        {
+            // Normalized UV
             float u = x / float(cols - 1);
             float v = y / float(rows - 1);
-            Vector2 p = Vector2(Math::lerp(-extents.x, extents.x, u),
-                                Math::lerp(-extents.y, extents.y, v));
 
+            // Map into actual 2D sprite coordinates
+            Vector2 p = Vector2(Math::lerp(-extents.x, extents.x, u), Math::lerp(-extents.y, extents.y, v));
+
+            // Store data
             int i = y * cols + x;
             rest_w[i] = p;
             pos_w[i]  = p;
@@ -131,7 +192,12 @@ void DistortionSprite2D::build_grid() {
     }
 }
 
-void DistortionSprite2D::integrate(float dt) {
+// -------------------------
+// PHYSICS SIMULATION
+// -------------------------
+
+void DistortionSprite2D::integrate(float dt)
+{
     static float time = 0.0f;
     time += dt;
 
@@ -139,7 +205,8 @@ void DistortionSprite2D::integrate(float dt) {
     Vector2 *pos = vertices.ptrw();
     Vector2 *vel = velocities.ptrw();
 
-    for (int i = 0; i < vertices.size(); i++) {
+    for (int i = 0; i < vertices.size(); i++)
+    {
         Vector2 spring = (rest[i] - pos[i]) * elasticity;
         Vector2 noise_force = sample_noise(pos[i], time) * noise_amplitude;
 
@@ -149,13 +216,22 @@ void DistortionSprite2D::integrate(float dt) {
     }
 }
 
+// -------------------------
+// PERLIN NOISE
+// -------------------------
+
 Vector2 DistortionSprite2D::sample_noise(const Vector2 &pos, float t) const {
+    // Small position scaling = smoother noise field
     float scale = 0.04f;
+
+    // Offset channels by 100 so that the noise isnt identical
     float nx = (perlin(pos.x * scale,       pos.y * scale,       t * noise_speed) * 2.0f - 1.0f);
     float ny = (perlin(pos.x * scale + 100, pos.y * scale + 100, t * noise_speed) * 2.0f - 1.0f);
+    
     return Vector2(nx, ny);
 }
 
+// Gradient vector lookup (perlin noise)
 float DistortionSprite2D::grad(int hash, float x, float y, float z) const {
     int h = hash & 15;
     float u = h < 8 ? x : y;
@@ -164,18 +240,22 @@ float DistortionSprite2D::grad(int hash, float x, float y, float z) const {
 }
 
 float DistortionSprite2D::perlin(float x, float y, float z) const {
+    // Identify Cube Cell
     int X = (int)Math::floor(x) & 255;
     int Y = (int)Math::floor(y) & 255;
     int Z = (int)Math::floor(z) & 255;
 
+    // Distance inside cube
     x -= Math::floor(x);
     y -= Math::floor(y);
     z -= Math::floor(z);
 
+    // Fade curves for interpolation
     float u = fade(x);
     float v = fade(y);
     float w = fade(z);
 
+    // Hash corner coordinates
     int A  = perm[X]     + Y; int AA = perm[A] + Z; int AB = perm[A+1] + Z;
     int B  = perm[X+1] + Y; int BA = perm[B] + Z; int BB = perm[B+1] + Z;
 
@@ -191,18 +271,25 @@ float DistortionSprite2D::perlin(float x, float y, float z) const {
             Math::lerp(u, grad(perm[AB+1], x,   y-1, z-1),
                           grad(perm[BB+1], x-1, y-1, z-1))));
 
-    return res; // returns [-1, 1]
+    return res;
 }
 
-void DistortionSprite2D::_draw() {
+// -------------------------
+// DRAWING THE DEFORMED MESH
+// -------------------------
+
+void DistortionSprite2D::_draw()
+{
     if (texture.is_null()) return;
 
     int cols = grid_size.x;
     int rows = grid_size.y;
 
+    // Temporary buffers for a single triangle
     PackedVector2Array points;
     PackedVector2Array uvs_arr;
     PackedColorArray colors;
+
     points.resize(3);
     uvs_arr.resize(3);
     colors.resize(3);
@@ -211,6 +298,7 @@ void DistortionSprite2D::_draw() {
     const Vector2 *vtx = vertices.ptr();
     const Vector2 *uv   = uvs.ptr();
 
+    // Loop through grid and draw each quad as 2 triangles
     for (int y = 0; y < rows - 1; y++) {
         for (int x = 0; x < cols - 1; x++) {
             int i00 = y * cols + x;
