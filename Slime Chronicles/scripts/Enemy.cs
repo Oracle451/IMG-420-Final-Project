@@ -99,12 +99,12 @@ public partial class Enemy : CharacterBody2D
 	{
 		if (_isDead) return;
 		_isDead = true;
+		SetProcess(false);
+		SetPhysicsProcess(false);
 		CallDeferred(nameof(_DeathSequence));
 	}
 	private void _DeathSequence()
 	{
-		SetProcess(false);
-		SetPhysicsProcess(false);
 		
 		GetNode<CollisionShape2D>("CollisionShape2D").Disabled = true; 
 		_popSound.Finished += OnPopSoundFinished;

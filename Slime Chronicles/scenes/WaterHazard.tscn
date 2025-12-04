@@ -7,6 +7,7 @@
 size = Vector2(698, 128)
 
 [node name="WaterHazzard" type="Node2D"]
+z_index = 2
 script = ExtResource("1_67n05")
 
 [node name="DistortionSprite2D" type="DistortionSprite2D" parent="."]
