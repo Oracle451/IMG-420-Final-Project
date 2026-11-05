@@ -119,9 +119,11 @@ jobs:
           godot --headless --import || true
           test -f .godot/extension_list.cfg
 
+      # Godot's solution only defines Debug / ExportDebug / ExportRelease
+      # (there is no plain "Release"). ExportRelease is what release exports use.
       - name: Build C# solution
         working-directory: ${{ env.PROJECT_DIR }}
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration ExportRelease
 
       - name: Export Linux
         run: |
