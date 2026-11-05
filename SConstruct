@@ -35,9 +35,12 @@ elif env["platform"] == "ios":
             source=sources,
         )
 else:
+    # No "lib" prefix on Linux, so the output matches the paths in
+    # "Slime Chronicles/bin/gdexample.gdextension" (Windows has no prefix anyway).
     library = env.SharedLibrary(
         "Slime Chronicles/bin/distortionLib{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
         source=sources,
+        SHLIBPREFIX="",
     )
 
 Default(library)
