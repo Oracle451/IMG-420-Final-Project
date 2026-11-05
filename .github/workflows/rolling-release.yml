@@ -36,7 +36,9 @@ jobs:
   # ---------------------------------------------------------------------------
   extension:
     name: Extension / ${{ matrix.platform }} / ${{ matrix.target }}
-    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || 'ubuntu-latest' }}
+    # Linux is pinned to an older Ubuntu on purpose: a library built on a newer
+    # image needs a newer glibc and fails to load on most players' distros.
+    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || 'ubuntu-22.04' }}
     strategy:
       fail-fast: true
       matrix:
@@ -109,6 +111,16 @@ jobs:
           use-dotnet: true
           include-templates: true
 
+      # IMPORTANT: build the *Debug* configuration, and do it before Godot runs.
+      # The editor only knows the game's C# classes (and their signals) if it can
+      # load the Debug assembly. Without it, the export silently drops every
+      # scene-file signal connection to a C# signal (e.g. ExitPipe -> LevelOne),
+      # so the exit pipe did nothing in the shipped game. (Godot's solution has no
+      # plain "Release" config; the export step builds ExportRelease on its own.)
+      - name: Build C# solution (Debug, for the editor)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: dotnet build --configuration Debug
+
       - name: Import project
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
@@ -119,17 +131,26 @@ jobs:
           godot --headless --import || true
           test -f .godot/extension_list.cfg
 
-      # Godot's solution only defines Debug / ExportDebug / ExportRelease
-      # (there is no plain "Release"). ExportRelease is what release exports use.
-      - name: Build C# solution
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dotnet build --configuration ExportRelease
-
       - name: Export Linux
         run: |
           mkdir -p build/linux
           godot --headless --path "$PROJECT_DIR" --export-release "Linux" "$GITHUB_WORKSPACE/build/linux/$GAME_NAME.x86_64"
           test -f "build/linux/$GAME_NAME.x86_64"
+
+      # Regression guard: every [connection] in the source scenes must still be
+      # present in the exported game (see the Debug build step above).
+      - name: Smoke test export (scene signal connections)
+        run: |
+          expected=$(grep -rh --include='*.tscn' '^\[connection' "$PROJECT_DIR" | wc -l)
+          output=$(cd build/linux && timeout 120 "./$GAME_NAME.x86_64" --headless \
+            --script "$GITHUB_WORKSPACE/.github/scripts/check_scene_connections.gd" 2>&1 || true)
+          echo "$output" | grep -E '^SCENE' || true
+          actual=$(echo "$output" | sed -n 's/^SCENE_CONNECTIONS=//p')
+          echo "connections in source: $expected / in exported game: ${actual:-unknown}"
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::Exported scenes lost signal connections (expected $expected, got ${actual:-unknown})"
+            exit 1
+          fi
 
       - name: Export Windows
         run: |
