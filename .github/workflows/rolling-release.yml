@@ -1,0 +1,214 @@
+name: Rolling Release
+
+# Builds the GDExtension + the Godot game on every push to main and publishes
+# the results as a single, always-up-to-date pre-release tagged `rolling`.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two release builds at once (they would fight over the `rolling` tag).
+# A newer push waits for the running build instead of cancelling it, so the
+# release is never left half-deleted.
+concurrency:
+  group: rolling-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  GODOT_VERSION: "4.4.1" # must match Godot.NET.Sdk in the .csproj and the godot-cpp branch
+  PROJECT_DIR: Slime Chronicles
+  GAME_NAME: SlimeChronicles
+  RELEASE_TAG: rolling
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Build the C++ GDExtension (DistortionSprite2D) for every OS / target.
+  #    Debug libs are needed because the Godot *editor* loads the debug build
+  #    when it imports the project; release libs are what ships in the game.
+  # ---------------------------------------------------------------------------
+  extension:
+    name: Extension / ${{ matrix.platform }} / ${{ matrix.target }}
+    runs-on: ${{ matrix.platform == 'windows' && 'windows-latest' || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [linux, windows]
+        target: [template_debug, template_release]
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons-cache
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install SCons
+        run: python -m pip install scons
+
+      - name: Restore SCons cache
+        uses: actions/cache@v4
+        with:
+          path: .scons-cache
+          key: scons-${{ matrix.platform }}-${{ matrix.target }}-${{ github.sha }}
+          restore-keys: scons-${{ matrix.platform }}-${{ matrix.target }}-
+
+      # The repo has a committed (Windows-generated) SCons signature DB and
+      # .obj files. Drop the DB so every CI build starts from a clean state.
+      - name: Remove stale SCons state
+        run: rm -f .sconsign.dblite
+
+      - name: Build
+        run: scons platform=${{ matrix.platform }} target=${{ matrix.target }} arch=x86_64 -j"$(nproc)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lib-${{ matrix.platform }}-${{ matrix.target }}
+          # Only the loadable library (skip the MSVC .lib/.exp import files).
+          path: |
+            ${{ env.PROJECT_DIR }}/bin/distortionLib.${{ matrix.platform }}.${{ matrix.target }}.x86_64.*
+            !**/*.lib
+            !**/*.exp
+          if-no-files-found: error
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # 2. Export the game (Godot 4.4.1 .NET) for Linux and Windows, and package
+  #    the extension on its own as a drop-in addon.
+  # ---------------------------------------------------------------------------
+  export:
+    name: Export game + package addon
+    needs: extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download built extension libraries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: lib-*
+          merge-multiple: true
+          path: ${{ env.PROJECT_DIR }}/bin
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Set up Godot ${{ env.GODOT_VERSION }} (.NET) + export templates
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          use-dotnet: true
+          include-templates: true
+
+      - name: Import project
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          godot --version
+          ls -la bin
+          # First import creates .godot/ (imported assets + extension list).
+          # Godot sometimes exits non-zero after an otherwise good import.
+          godot --headless --import || true
+          test -f .godot/extension_list.cfg
+
+      - name: Build C# solution
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: dotnet build --configuration Release
+
+      - name: Export Linux
+        run: |
+          mkdir -p build/linux
+          godot --headless --path "$PROJECT_DIR" --export-release "Linux" "$GITHUB_WORKSPACE/build/linux/$GAME_NAME.x86_64"
+          test -f "build/linux/$GAME_NAME.x86_64"
+
+      - name: Export Windows
+        run: |
+          mkdir -p build/windows
+          godot --headless --path "$PROJECT_DIR" --export-release "Windows Desktop" "$GITHUB_WORKSPACE/build/windows/$GAME_NAME.exe"
+          test -f "build/windows/$GAME_NAME.exe"
+
+      - name: Package game and addon
+        run: |
+          mkdir -p dist
+
+          # Games: zip the *contents* of each export folder.
+          chmod +x "build/linux/$GAME_NAME.x86_64"
+          (cd build/linux   && zip -qr "$GITHUB_WORKSPACE/dist/$GAME_NAME-linux-x86_64.zip"   .)
+          (cd build/windows && zip -qr "$GITHUB_WORKSPACE/dist/$GAME_NAME-windows-x86_64.zip" .)
+
+          # Addon: the .gdextension + libs, with paths rewritten so it works
+          # when dropped into a project's addons/ folder.
+          addon=build/addon/addons/distortion_sprite_2d
+          mkdir -p "$addon"
+          cp "$PROJECT_DIR"/bin/distortionLib.*.so  "$addon"/
+          cp "$PROJECT_DIR"/bin/distortionLib.*.dll "$addon"/
+          sed -e 's#res://bin/#res://addons/distortion_sprite_2d/#' \
+              -e '/macos/d' \
+              "$PROJECT_DIR/bin/gdexample.gdextension" > "$addon/distortion_sprite_2d.gdextension"
+          (cd build/addon && zip -qr "$GITHUB_WORKSPACE/dist/DistortionSprite2D-addon.zip" addons)
+
+          ls -lh dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # 3. Replace the `rolling` release with the fresh build.
+  #    This is the only job with write access.
+  # ---------------------------------------------------------------------------
+  release:
+    name: Publish rolling release
+    needs: export
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Write release notes
+        run: |
+          short_sha="${GITHUB_SHA::7}"
+          subject="$(printf '%s\n' "$COMMIT_MESSAGE" | head -n1)"
+          {
+            echo "Automatic build of the latest \`main\`. This release is replaced on every push."
+            echo
+            echo "- **Commit:** [\`$short_sha\`]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA)${subject:+ — $subject}"
+            echo "- **Built:** $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo "- **Engine:** Godot $GODOT_VERSION (.NET)"
+            echo
+            echo "| File | What it is |"
+            echo "| --- | --- |"
+            echo "| \`$GAME_NAME-windows-x86_64.zip\` | Playable game, Windows 64-bit |"
+            echo "| \`$GAME_NAME-linux-x86_64.zip\` | Playable game, Linux 64-bit |"
+            echo "| \`DistortionSprite2D-addon.zip\` | The GDExtension on its own, drop into your project's \`addons/\` folder |"
+          } > notes.md
+          cat notes.md
+
+      - name: Replace rolling release
+        run: |
+          # Delete the old release *and* its tag so the tag moves to this commit.
+          gh release delete "$RELEASE_TAG" --cleanup-tag --yes || true
+          gh release create "$RELEASE_TAG" dist/* \
+            --target "$GITHUB_SHA" \
+            --title "Rolling build (${GITHUB_SHA::7})" \
+            --notes-file notes.md \
+            --prerelease

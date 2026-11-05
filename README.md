@@ -11,6 +11,11 @@ Integration of procedural animation system into gameplay, collision response, sl
 - **John Zeledon** – Designer / Technical Artist\
 Parameter tuning, visual style development, test scenes, UI setup.
 
+## Download & Website
+
+- **Play:** every push to `main` publishes a fresh build to the [rolling release](https://github.com/Oracle451/IMG-420-Final-Project/releases/tag/rolling) (Windows, Linux, and the standalone `DistortionSprite2D` addon).
+- **Website:** https://oracle451.github.io/IMG-420-Final-Project/
+
 ## Module Functionality Description
 
 The Procedural Animation & Distortion GDExtension introduces a new node type: **DistortionSprite2D**.

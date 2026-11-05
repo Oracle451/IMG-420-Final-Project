@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slime Chronicles - a squishy platformer built on a C++ GDExtension</title>
+  <meta name="description" content="Slime Chronicles is a 2D Godot platformer powered by DistortionSprite2D, a custom C++ GDExtension for real-time soft-body mesh deformation. Download the latest build.">
+  <meta name="color-scheme" content="dark light">
+  <meta property="og:title" content="Slime Chronicles">
+  <meta property="og:description" content="A squishy 2D platformer powered by a custom C++ GDExtension for real-time soft-body deformation.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./"><img class="pixel" src="assets/slime.png" alt="" width="28" height="28"> Slime Chronicles</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="#play">Play</a>
+      <a href="#module" class="optional">The module</a>
+      <a href="#controls" class="optional">Controls</a>
+      <a href="#docs">Docs</a>
+      <a href="#team" class="optional">Team</a>
+      <a href="https://github.com/Oracle451/IMG-420-Final-Project">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== hero ===== -->
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">IMG 420 · FINAL PROJECT</p>
+        <h1>Slime <span>Chronicles</span></h1>
+        <p class="lead">A squishy 2D platformer where every sprite jiggles, squashes and ripples - powered by a custom C++ GDExtension for real-time soft-body deformation in Godot&nbsp;4.</p>
+        <div class="actions">
+          <a class="btn" href="https://github.com/Oracle451/IMG-420-Final-Project/releases/download/rolling/SlimeChronicles-windows-x86_64.zip">⬇ Windows</a>
+          <a class="btn" href="https://github.com/Oracle451/IMG-420-Final-Project/releases/download/rolling/SlimeChronicles-linux-x86_64.zip">⬇ Linux</a>
+          <a class="btn ghost" href="#demo">▶ Watch the demo</a>
+        </div>
+        <p class="build-info" id="build-info">Rolling release - rebuilt automatically on every push to <code>main</code>.</p>
+      </div>
+      <div class="stage" aria-hidden="true">
+        <img class="pixel hero-tar" src="assets/tar.png" alt="">
+        <img class="pixel hero-slime" src="assets/slime.png" alt="">
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== demo ===== -->
+  <section id="demo">
+    <div class="wrap">
+      <h2>See it wobble</h2>
+      <p class="section-lead">The slime, the enemies, the UI and the environment all share one distortion system, so the whole game feels like jelly.</p>
+      <iframe class="video"
+        src="https://www.youtube-nocookie.com/embed/VdhjqB3qmBI"
+        title="Slime Chronicles gameplay demo"
+        loading="lazy"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <!-- ===== module ===== -->
+  <section id="module" class="alt">
+    <div class="wrap">
+      <h2>Meet DistortionSprite2D</h2>
+      <p class="section-lead">The extension adds a new node type that deforms a sprite's mesh in real time - physics-aware, scriptable from C#, and tweakable right in the Inspector. Unlike shaders or pre-baked animation, it reacts to what's actually happening in the game.</p>
+      <div class="grid">
+        <div class="card feature"><div class="icon" aria-hidden="true">🧲</div><h3>Procedural deformation</h3><p>Real-time vertex updates using spring-damper physics on a lattice.</p></div>
+        <div class="card feature"><div class="icon" aria-hidden="true">🌊</div><h3>Noise distortion</h3><p>Perlin / Simplex noise gives natural idle wobble and ripple effects.</p></div>
+        <div class="card feature"><div class="icon" aria-hidden="true">💥</div><h3>Impulse response</h3><p>Collision impacts propagate through the mesh for squash and stretch.</p></div>
+        <div class="card feature"><div class="icon" aria-hidden="true">🧩</div><h3>Custom node type</h3><p><code>DistortionSprite2D</code> extends <code>Node2D</code> for easy drop-in use.</p></div>
+        <div class="card feature"><div class="icon" aria-hidden="true">🎛️</div><h3>Editor parameters</h3><p>Elasticity, damping, noise amplitude and speed, subdivision, texture.</p></div>
+        <div class="card feature"><div class="icon" aria-hidden="true">#️⃣</div><h3>C# API</h3><p>Trigger impulses, set deformation states and freeze motion from code.</p></div>
+        <div class="card feature"><div class="icon" aria-hidden="true">🧱</div><h3>TileMap integration</h3><p>Per-tile deformation without visible seams.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== downloads ===== -->
+  <section id="play">
+    <div class="wrap">
+      <h2>Download</h2>
+      <p class="section-lead">Every push to <code>main</code> publishes a fresh build to the <a href="https://github.com/Oracle451/IMG-420-Final-Project/releases/tag/rolling">rolling release</a>. Unzip and run - no install needed.</p>
+      <div class="downloads">
+        <div class="card dl">
+          <div><h3>Slime Chronicles - Windows</h3><p>64-bit · unzip and run <code>SlimeChronicles.exe</code> <span data-size="SlimeChronicles-windows-x86_64.zip"></span></p></div>
+          <a class="btn" href="https://github.com/Oracle451/IMG-420-Final-Project/releases/download/rolling/SlimeChronicles-windows-x86_64.zip">⬇ Download</a>
+        </div>
+        <div class="card dl">
+          <div><h3>Slime Chronicles - Linux</h3><p>64-bit · unzip, then run <code>./SlimeChronicles.x86_64</code> <span data-size="SlimeChronicles-linux-x86_64.zip"></span></p></div>
+          <a class="btn" href="https://github.com/Oracle451/IMG-420-Final-Project/releases/download/rolling/SlimeChronicles-linux-x86_64.zip">⬇ Download</a>
+        </div>
+        <div class="card dl">
+          <div><h3>DistortionSprite2D - addon only</h3><p>Just the GDExtension (Windows + Linux). Drop <code>addons/</code> into your own Godot 4.4 project. <span data-size="DistortionSprite2D-addon.zip"></span></p></div>
+          <a class="btn ghost" href="https://github.com/Oracle451/IMG-420-Final-Project/releases/download/rolling/DistortionSprite2D-addon.zip">⬇ Download</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== controls ===== -->
+  <section id="controls" class="alt">
+    <div class="wrap">
+      <h2>Controls</h2>
+      <p class="section-lead">Slime reacts to every collision with squash and stretch, and idles with a noise-driven wobble.</p>
+      <ul class="controls">
+        <li><kbd>←</kbd><kbd>→</kbd> Move left / right</li>
+        <li><kbd>Space</kbd> Jump</li>
+        <li><kbd>E</kbd> Dash</li>
+        <li><kbd>Q</kbd><kbd>R</kbd> Scale slime bigger / smaller</li>
+        <li><kbd>Left click</kbd> Shoot a slime ball</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== docs ===== -->
+  <section id="docs">
+    <div class="wrap">
+      <h2>Documentation</h2>
+      <p class="section-lead">Everything you need to use, build, or extend the extension.</p>
+      <div class="grid">
+        <a class="card" href="doc.html?p=guide"><h3>User Guide</h3><p>Quick start, Inspector properties and scripting examples.</p><span class="tag">Read →</span></a>
+        <a class="card" href="doc.html?p=api"><h3>API Reference</h3><p>Properties, methods and recommended settings for <code>DistortionSprite2D</code>.</p><span class="tag">Read →</span></a>
+        <a class="card" href="doc.html?p=build"><h3>Build Instructions</h3><p>Compile the extension yourself with godot-cpp and SCons.</p><span class="tag">Read →</span></a>
+        <a class="card" href="DESIGN_DOCUMENT.pdf"><h3>Design Document</h3><p>The project design write-up (PDF).</p><span class="tag">Open PDF →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== team ===== -->
+  <section id="team" class="alt">
+    <div class="wrap">
+      <h2>The team</h2>
+      <p class="section-lead">Three students, one very bouncy slime.</p>
+      <div class="grid">
+        <div class="card person"><h3>Cole Bishop</h3><div class="role">Systems Developer</div><p>Core C++ GDExtension implementation, gameplay mechanics outlining, performance optimization.</p></div>
+        <div class="card person"><h3>Tyler Jeffrey</h3><div class="role">Gameplay Programmer</div><p>Integration of the procedural animation system into gameplay, collision response, slime behavior.</p></div>
+        <div class="card person"><h3>John Zeledon</h3><div class="role">Designer / Technical Artist</div><p>Parameter tuning, visual style development, test scenes, UI setup.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== credits ===== -->
+  <section id="credits">
+    <div class="wrap">
+      <h2>Credits</h2>
+      <p class="section-lead"><strong>Inspiration:</strong> Slime Rancher (Monomi Park), Gish (Cryptic Sea), Celeste (Maddy Makes Games).<br>
+        <strong>Built with:</strong> <a href="https://godotengine.org">Godot 4</a>, <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/index.html">GDExtension</a> and <a href="https://github.com/godotengine/godot-cpp">godot-cpp</a>.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Slime Chronicles · IMG 420 Final Project</span>
+    <ul>
+      <li><a href="https://github.com/Oracle451/IMG-420-Final-Project">Source</a></li>
+      <li><a href="https://github.com/Oracle451/IMG-420-Final-Project/releases/tag/rolling">Releases</a></li>
+      <li><a href="https://github.com/Oracle451/IMG-420-Final-Project/issues">Issues</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script src="assets/site.js" defer></script>
+</body>
+</html>
